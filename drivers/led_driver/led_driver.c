@@ -35,7 +35,7 @@ static ssize_t etx_write(struct file *filp, const char *buf, size_t len, loff_t 
 static struct file_operations fops = {
     .owner = THIS_MODULE,
     .read = etx_read,
-    F.write = etx_write,
+    .write = etx_write,
     .open = etx_open,
     .release = etx_release,
 };

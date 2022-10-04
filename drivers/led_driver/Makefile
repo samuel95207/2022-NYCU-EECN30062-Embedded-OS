@@ -1,11 +1,11 @@
-obj-m += driver.o
+ARCH?=arm64 
+CROSS_COMPILE?=aarch64-linux-gnu-
+
+obj-m += led_driver.o
  
-KDIR = /lib/modules/$(shell uname -r)/build
+KDIR = ../../linux
 
 all:
-	make -C $(KDIR) M=$(shell pwd) modules
+	make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KDIR) M=$(shell pwd) modules
 clean:
-	make -C $(KDIR) M=$(shell pwd) clean
-
-driver.o:
-	gcc -g -O -c led_driver.c
+	make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KDIR) M=$(shell pwd) clean
