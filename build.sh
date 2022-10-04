@@ -1,5 +1,5 @@
-# CONFIG=bcm2711_defconfig
-CONFIG=menuconfig
+CONFIG=bcm2711_defconfig
+# CONFIG=menuconfig
 
 cd linux
 KERNEL=kernel8
