@@ -72,7 +72,7 @@ static ssize_t etx_read(struct file *filp, char __user *buf, size_t len, loff_t 
 ** This function will be called when we write the Device file
 */
 static ssize_t etx_write(struct file *filp, const char __user *buf, size_t len, loff_t *off) {
-    uint8_t rec_buf[10] = {0};
+    uint8_t rec_buf[20] = {0};
     if (copy_from_user(rec_buf, buf, len) > 0) {
         pr_err("ERROR: Not all the bytes have been copied from user\n");
     }

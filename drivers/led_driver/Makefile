@@ -1,7 +1,7 @@
 ARCH?=arm64 
 CROSS_COMPILE?=aarch64-linux-gnu-
 
-obj-m += led_driver.o
+obj-m += driver.o
  
 KDIR = ../../linux
 
