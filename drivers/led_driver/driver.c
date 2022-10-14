@@ -20,6 +20,12 @@
 #include <linux/uaccess.h>  //copy_to/from_user()
 // LED is connected to this GPIO
 #define GPIO_21 (21)
+#define GPIO_22 (22)
+#define GPIO_23 (23)
+#define GPIO_24 (24)
+
+int gpioArr[4] = {GPIO_21, GPIO_22, GPIO_23, GPIO_24};
+
 dev_t dev = 0;
 static struct class *dev_class;
 static struct cdev etx_cdev;
@@ -59,13 +65,16 @@ static int etx_release(struct inode *inode, struct file *file) {
 static ssize_t etx_read(struct file *filp, char __user *buf, size_t len, loff_t *off) {
     uint8_t gpio_state = 0;
     // reading GPIO value
-    gpio_state = gpio_get_value(GPIO_21);
     // write to user
-    len = 1;
-    if (copy_to_user(buf, &gpio_state, len) > 0) {
-        pr_err("ERROR: Not all the bytes have been copied to user\n");
+    for(int i = 0;i < 4;i++){
+        int gpio = gpioArr[i];
+        gpio_state = gpio_get_value(gpio);
+        len = 1;
+        if (copy_to_user(buf, &gpio_state, len) > 0) {
+            pr_err("ERROR: Not all the bytes have been copied to user\n");
+        }
+        pr_info("Read function : GPIO_%d = %d \n", gpio, gpio_state);
     }
-    pr_info("Read function : GPIO_21 = %d \n", gpio_state);
     return 0;
 }
 /*
@@ -76,16 +85,36 @@ static ssize_t etx_write(struct file *filp, const char __user *buf, size_t len, 
     if (copy_from_user(rec_buf, buf, len) > 0) {
         pr_err("ERROR: Not all the bytes have been copied from user\n");
     }
-    pr_info("Write Function : GPIO_21 Set = %c\n", rec_buf[0]);
-    if (rec_buf[0] == '1') {
-        // set the GPIO value to HIGH
-        gpio_set_value(GPIO_21, 1);
-    } else if (rec_buf[0] == '0') {
-        // set the GPIO value to LOW
-        gpio_set_value(GPIO_21, 0);
-    } else {
-        pr_err("Unknown command : Please provide either 1 or 0 \n");
+    
+    for (int i = 0; rec_buf[i] != '\0'; i++) {
+        char c = rec_buf[i];
+        int num = c - '0';
+        int bin[4] = {0, 0, 0, 0};
+        if (num >= 0 && num < 10) {
+            pr_info("%d\n", num);
+
+            for (int j = 0; num > 0; j++) {
+                bin[3 - j] = num % 2;
+                num = num / 2;
+            }
+            pr_info("%d%d%d%d\n", bin[0], bin[1], bin[2], bin[3]);
+
+            for (int j = 0; j < 4; j++) {
+                gpio_set_value(gpioArr[j], bin[j]);
+            }
+            mdelay(1000);
+            for (int j = 0; j < 4; j++) {
+                gpio_set_value(gpioArr[j], 0);
+            }
+            mdelay(100);
+        }else{
+            pr_err("Unknown char: %c is not a digit\n", c);
+        }
+        for (int j = 0; j < 4; j++) {
+            gpio_set_value(gpioArr[j], 0);
+        }
     }
+
     return len;
 }
 /*
@@ -116,17 +145,25 @@ static int __init etx_driver_init(void) {
         goto r_device;
     }
     // Checking the GPIO is valid or not
-    if (gpio_is_valid(GPIO_21) == false) {
-        pr_err("GPIO %d is not valid\n", GPIO_21);
-        goto r_device;
+    for (int i = 0; i < 4; i++) {
+        if (gpio_is_valid(gpioArr[i]) == false) {
+            pr_err("GPIO_%d is not valid\n", gpioArr[i]);
+            goto r_device;
+        }
     }
     // Requesting the GPIO
-    if (gpio_request(GPIO_21, "GPIO_21") < 0) {
-        pr_err("ERROR: GPIO %d request\n", GPIO_21);
-        goto r_gpio;
+    for (int i = 0; i < 4; i++) {
+        char label[] = "GPIO_%d!";
+        printk(label, gpioArr[i]);
+        if (gpio_request(gpioArr[i], label) < 0) {
+            pr_err("ERROR: GPIO_%d request\n", gpioArr[i]);
+            goto r_gpio;
+        }
     }
     // configure the GPIO as output
-    gpio_direction_output(GPIO_21, 0);
+    for (int i = 0; i < 4; i++) {
+        gpio_direction_output(gpioArr[i], 0);
+    }
     /* Using this call the GPIO 21 will be visible in /sys/class/gpio/
     ** Now you can change the gpio values by using below commands also.
     ** echo 1 > /sys/class/gpio/gpio21/value (turn ON the LED)
@@ -135,11 +172,16 @@ static int __init etx_driver_init(void) {
     **
     ** the second argument prevents the direction from being changed.
     */
-    gpio_export(GPIO_21, false);
+    for (int i = 0; i < 4; i++) {
+        gpio_export(gpioArr[i], false);
+    }
+
     pr_info("Device Driver Insert...Done!!!\n");
     return 0;
 r_gpio:
-    gpio_free(GPIO_21);
+    for (int i = 0; i < 4; i++) {
+        gpio_free(gpioArr[i]);
+    }
 r_device:
     device_destroy(dev_class, dev);
 r_class:
@@ -154,8 +196,12 @@ r_unreg:
 ** Module exit function
 */
 static void __exit etx_driver_exit(void) {
-    gpio_unexport(GPIO_21);
-    gpio_free(GPIO_21);
+    for (int i = 0; i < 4; i++) {
+        gpio_unexport(gpioArr[i]);
+    }
+    for (int i = 0; i < 4; i++) {
+        gpio_free(gpioArr[i]);
+    }
     device_destroy(dev_class, dev);
     class_destroy(dev_class);
     cdev_del(&etx_cdev);
