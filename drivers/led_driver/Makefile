@@ -5,6 +5,8 @@ obj-m += driver.o
  
 KDIR = ../../linux
 
+ccflags-y := -std=gnu11 -Wno-declaration-after-statement
+
 all:
 	make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KDIR) M=$(shell pwd) modules
 clean:
