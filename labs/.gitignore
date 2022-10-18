@@ -162,5 +162,5 @@ x509.genkey
 # Documentation toolchain
 sphinx_*/
 
-led_driver/writer
-led_driver/*.zip
+lab3/writer
+lab3/*.zip
