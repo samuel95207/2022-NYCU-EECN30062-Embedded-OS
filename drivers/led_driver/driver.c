@@ -66,7 +66,7 @@ static ssize_t etx_read(struct file *filp, char __user *buf, size_t len, loff_t 
     uint8_t gpio_state = 0;
     // reading GPIO value
     // write to user
-    for(int i = 0;i < 4;i++){
+    for (int i = 0; i < 4; i++) {
         int gpio = gpioArr[i];
         gpio_state = gpio_get_value(gpio);
         len = 1;
@@ -85,34 +85,24 @@ static ssize_t etx_write(struct file *filp, const char __user *buf, size_t len, 
     if (copy_from_user(rec_buf, buf, len) > 0) {
         pr_err("ERROR: Not all the bytes have been copied from user\n");
     }
-    
-    for (int i = 0; rec_buf[i] != '\0'; i++) {
-        char c = rec_buf[i];
-        int num = c - '0';
-        int bin[4] = {0, 0, 0, 0};
-        if (num >= 0 && num < 10) {
-            pr_info("%d\n", num);
 
-            for (int j = 0; num > 0; j++) {
-                bin[3 - j] = num % 2;
-                num = num / 2;
-            }
-            pr_info("%d%d%d%d\n", bin[0], bin[1], bin[2], bin[3]);
+    char c = rec_buf[0];
+    int num = c - '0';
+    int bin[4] = {0, 0, 0, 0};
+    if (num >= 0 && num < 10) {
+        pr_info("%d\n", num);
 
-            for (int j = 0; j < 4; j++) {
-                gpio_set_value(gpioArr[j], bin[j]);
-            }
-            mdelay(1000);
-            for (int j = 0; j < 4; j++) {
-                gpio_set_value(gpioArr[j], 0);
-            }
-            mdelay(100);
-        }else{
-            pr_err("Unknown char: %c is not a digit\n", c);
+        for (int j = 0; num > 0; j++) {
+            bin[3 - j] = num % 2;
+            num = num / 2;
         }
+        pr_info("%d%d%d%d\n", bin[0], bin[1], bin[2], bin[3]);
+
         for (int j = 0; j < 4; j++) {
-            gpio_set_value(gpioArr[j], 0);
+            gpio_set_value(gpioArr[j], bin[j]);
         }
+    } else {
+        pr_err("Unknown char: %c is not a digit\n", c);
     }
 
     return len;
