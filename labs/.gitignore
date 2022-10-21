@@ -164,3 +164,6 @@ sphinx_*/
 
 lab3/writer
 lab3/*.zip
+lab4/writer
+lab4/reader
+lab4/*.zip
