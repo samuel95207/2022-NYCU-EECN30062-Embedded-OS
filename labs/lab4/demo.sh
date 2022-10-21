@@ -6,5 +6,5 @@ set -x
 rmmod -f mydev
 insmod mydev.ko
 
-./writer abcd &
-./reader 192.168.0.12 8688 /dev/mydev
+./writer samuel &
+./reader 127.0.0.1 8080 /dev/mydev
