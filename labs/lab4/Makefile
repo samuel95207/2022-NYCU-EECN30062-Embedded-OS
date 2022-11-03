@@ -14,8 +14,8 @@ all:
 
 clean:
 	make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KDIR) M=$(shell pwd) clean
-	rm writer
-	rm reader
+	rm -f writer
+	rm -f reader
 
 zip:
 	rm -rf 311511034_eos_lab4
