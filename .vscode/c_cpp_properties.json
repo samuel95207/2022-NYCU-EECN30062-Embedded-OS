@@ -10,10 +10,11 @@
                 "${workspaceFolder}/linux/arch/arm64/include",
                 "${workspaceFolder}/linux/arch/arm64/include/generated",
                 "${workspaceFolder}/linux/arch/arm64/include/uapi",
-                "${workspaceFolder}/linux/arch/arm64/include/generated/uapi"
+                "${workspaceFolder}/linux/arch/arm64/include/generated/uapi",
+                "/usr/include",
+                "/usr/local/include"
             ],
             "compilerArgs": [
-                "-nostdinc",
                 "-include",
                 "${workspaceFolder}/linux/include/linux/kconfig.h",
                 "-include",
@@ -3489,7 +3490,7 @@
                 "CONFIG_ZPOOL 1",
                 "CONFIG_INPUT_AD714X_MODULE 1"
             ],
-            "compilerPath": "/usr/bin/aarch64-linux-gnu-gcc",
+            "compilerPath": "/usr/bin/aarch64-linux-gnu-g++",
             "cStandard": "c11",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-gcc-arm64"
