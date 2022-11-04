@@ -21,15 +21,12 @@ clean:
 	rm -f hw1
 
 zip:
-	rm -rf 311511034_eos_lab4
-	rm -rf 311511034_eos_lab4.zip
-	mkdir 311511034_eos_lab4
-	cp Makefile 311511034_eos_lab4
-	cp mydev.c 311511034_eos_lab4
-	cp writer.c 311511034_eos_lab4
-	cp reader.c 311511034_eos_lab4
-	cp seg.py 311511034_eos_lab4
-	cp demo.sh 311511034_eos_lab4
-	zip -r 311511034_eos_lab4.zip 311511034_eos_lab4
-	rm -rf 311511034_eos_lab4
-
+	rm -rf 311511034_eos_hw1
+	rm -rf 311511034_eos_hw1.zip
+	mkdir 311511034_eos_hw1
+	cp Makefile 311511034_eos_hw1
+	cp hw1.c 311511034_eos_hw1
+	cp led8_driver.c 311511034_eos_hw1
+	cp seg7_driver.c 311511034_eos_hw1
+	zip -r 311511034_eos_hw1.zip 311511034_eos_hw1
+	rm -rf 311511034_eos_hw1
